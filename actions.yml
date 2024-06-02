@@ -1,0 +1,33 @@
+name: chatbot CI/CD Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        pytest
+
+    - name: Build Docker image
+      run: |
+        docker build -t my-chatbot .
+
+    - name: Push Docker image to registry
+      run: |
+        docker tag my-chatbot:latest myregistry/my-chatbot:latest
+        docker push myregistry/my-chatbot:latest
