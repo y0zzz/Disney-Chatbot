@@ -1,0 +1,18 @@
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── disneydata.py
+│   └── disneychatbot.py
+├── tests/
+│   ├── __init__.py
+│   └── test_main.py
+├── Dockerfile
+├── requirements.txt
+├── terraform/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── .github/
+│   └── workflows/
+│       └── actions.yml
+└── README.md
