@@ -5,18 +5,18 @@ A small Q&A chatbot that answers questions about Disney movies and company trivi
 Originally built as a simple Flask app with hardcoded rules; rebuilt on FastAPI with a proper package structure, a real test suite, and a working CI pipeline.
 
 # Features
-Answers movie release-date questions (Lion King, Mulan, Aladdin + sequels)
-Answers company trivia (founding date, founders, current CEO)
-Falls back to a live Wikipedia summary for anything else
-Fully typed, tested FastAPI backend
-Automated tests + Docker build on every push (GitHub Actions)
+- Answers movie release-date questions (Lion King, Mulan, Aladdin + sequels)
+- Answers company trivia (founding date, founders, current CEO)
+- Falls back to a live Wikipedia summary for anything else
+- Fully typed, tested FastAPI backend
+- Automated tests + Docker build on every push (GitHub Actions)
 
 # Tech stack
-FastAPI — web framework
-Pydantic — request/response validation
-wikipedia-api — Wikipedia fallback lookups
-pytest — test suite
-Docker — containerized deployment
+- FastAPI — web framework
+- Pydantic — request/response validation
+- wikipedia-api — Wikipedia fallback lookups
+- pytest — test suite
+- Docker — containerized deployment
 
 # Project structure
 
