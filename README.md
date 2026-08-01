@@ -1,14 +1,12 @@
 # Disney Chatbot
 
-A small Q&A chatbot that answers questions about Disney movies and company trivia, with a live Wikipedia fallback for anything outside its local knowledge base.
-
-Originally built as a simple Flask app with hardcoded rules; rebuilt on FastAPI with a proper package structure, a real test suite, and a working CI pipeline.
+A small Q&A chatbot that answers questions about Disney movies and company trivia. Local facts answer instantly; anything else routes through a self-hosted LLM proxy ([llm-api](https://github.com/y0zzz/llm-api)), with a Wikipedia fallback if that's unavailable.
 
 ## Features
 
 - Answers movie release-date questions (Lion King, Mulan, Aladdin + sequels)
 - Answers company trivia (founding date, founders, current CEO)
-- Falls back to a live Wikipedia summary for anything else
+- Falls back to an LLM for open-ended questions, then Wikipedia if the LLM is unreachable
 - Fully typed, tested FastAPI backend
 - Automated tests + Docker build on every push (GitHub Actions)
 
@@ -16,8 +14,9 @@ Originally built as a simple Flask app with hardcoded rules; rebuilt on FastAPI 
 
 - **FastAPI** — web framework
 - **Pydantic** — request/response validation
+- **httpx** — calls to the llm-api proxy
 - **wikipedia-api** — Wikipedia fallback lookups
-- **pytest** — test suite
+- **pytest / pytest-asyncio** — test suite
 - **Docker** — containerized deployment
 
 ## Project structure
@@ -26,13 +25,16 @@ Originally built as a simple Flask app with hardcoded rules; rebuilt on FastAPI 
 ├── app/
 │   ├── main.py            # FastAPI app + routes
 │   ├── disneychatbot.py   # Routing logic
-│   ├── disneydata.py      # Local knowledge base (movies, company facts)
+│   ├── disneydata.py      # Local knowledge base
+│   ├── llm_client.py      # llm-api proxy client
+│   ├── config.py          # Env var config
 │   └── wiki.py            # Wikipedia fallback helper
 ├── tests/
-│   └── test_main.py       # Test suite
+│   └── test_main.py
 ├── .github/workflows/
-│   └── ci.yml             # CI: runs tests + builds Docker image
+│   └── ci.yml
 ├── Dockerfile
+├── pytest.ini
 ├── requirements.txt
 └── requirements-dev.txt
 ```
@@ -43,6 +45,13 @@ Install dependencies:
 
 ```
 pip install -r requirements-dev.txt
+```
+
+(Optional) point it at your own llm-api proxy for open-ended answers:
+
+```
+export LLM_API_BASE_URL="http://localhost:8080"
+export LLM_API_KEY="your-key-here"
 ```
 
 Run the server:
@@ -87,6 +96,7 @@ MovieFact("Encanto", "November 24, 2021", aliases=("encanto",))
 
 ## Roadmap
 
-- [ ] Swap keyword matching for LLM-based intent handling via a self-hosted [llm-api](https://github.com/y0zzz/llm-api) proxy
+- [x] Modernize architecture (FastAPI, tests, CI)
+- [x] LLM fallback via self-hosted llm-api proxy
 - [ ] Add a lightweight chat frontend
 - [ ] Deploy (Render + Vercel)
