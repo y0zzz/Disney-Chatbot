@@ -1,6 +1,13 @@
-"""Core chatbot logic: routes a user message to the right answer source."""
+"""Core chatbot logic: routes a user message to the right answer source.
+
+Order of precedence:
+  1. Local knowledge base (instant, free, always correct)
+  2. LLM proxy (llm-api) -- handles anything not explicitly hardcoded
+  3. Wikipedia summary -- last-resort fallback if the LLM is unavailable
+"""
 
 from app.disneydata import COMPANY_FACTS, find_movie
+from app.llm_client import LLMClient
 from app.wiki import WikipediaHelper
 
 FALLBACK_MESSAGE = (
@@ -10,23 +17,36 @@ FALLBACK_MESSAGE = (
 
 
 class DisneyChatbot:
-    def __init__(self, wiki_helper: WikipediaHelper | None = None):
+    def __init__(
+        self,
+        wiki_helper: WikipediaHelper | None = None,
+        llm_client: LLMClient | None = None,
+    ):
         self.wiki_helper = wiki_helper or WikipediaHelper()
+        self.llm_client = llm_client or LLMClient()
 
-    def respond(self, user_input: str) -> str:
+    async def respond(self, user_input: str) -> str:
         if not user_input or not user_input.strip():
             return FALLBACK_MESSAGE
 
         text = user_input.lower()
 
+        # 1. Known movie facts (fast, no network call)
         movie = find_movie(text)
         if movie:
             return f"{movie.title} was released on {movie.release_date}."
 
+        # 2. Company facts
         for keyword, fact in COMPANY_FACTS.items():
             if keyword in text:
                 return fact
 
+        # 3. LLM fallback -- handles anything open-ended
+        llm_answer = await self.llm_client.ask(user_input)
+        if llm_answer:
+            return llm_answer
+
+        # 4. Wikipedia, only if the LLM is unavailable/unconfigured
         if "film" in text or "movie" in text:
             movie_name = self._extract_topic(text)
             if movie_name:
@@ -39,6 +59,7 @@ class DisneyChatbot:
 
     @staticmethod
     def _extract_topic(text: str) -> str:
+        """Pull the likely topic out of a phrase like 'tell me about the film X'."""
         for splitter in (" about ", " om "):
             if splitter in text:
                 return text.split(splitter)[-1].strip()

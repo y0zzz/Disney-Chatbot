@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 app = FastAPI(
     title="Disney Chatbot",
     description="A small Q&A chatbot for Disney movie and company trivia.",
-    version="2.0.0",
+    version="2.1.0",
 )
 
 chatbot = DisneyChatbot()
@@ -32,8 +32,8 @@ def health() -> dict[str, str]:
 
 
 @app.post("/chat", response_model=ChatResponse)
-def chat(payload: ChatRequest) -> ChatResponse:
-    reply = chatbot.respond(payload.message)
+async def chat(payload: ChatRequest) -> ChatResponse:
+    reply = await chatbot.respond(payload.message)
     return ChatResponse(response=reply)
 
 
