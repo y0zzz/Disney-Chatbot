@@ -1,5 +1,7 @@
 # Disney Chatbot
 
+![Disney Chatbot demo](docs/demo.gif)
+
 A small Q&A chatbot that answers questions about Disney movies and company trivia. Local facts answer instantly; anything else routes through a self-hosted LLM proxy ([llm-api](https://github.com/y0zzz/llm-api)), with a Wikipedia fallback if that's unavailable.
 
 ## Features
